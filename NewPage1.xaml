@@ -2,49 +2,66 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="LAB2_OOP_MAUI.NewPage1"
+             Title="Пошук Секцій"
              BackgroundColor="#f0f2f5">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="20">
+        <VerticalStackLayout Spacing="15" Padding="20">
 
-            <Label Text="Система запису на секції"
-                   FontSize="22" FontAttributes="Bold" HorizontalOptions="Center" />
+            <Label Text="Спорт на факультеті" 
+                   FontSize="24" 
+                   FontAttributes="Bold" 
+                   HorizontalOptions="Center" 
+                   TextColor="#333"/>
 
-            <Frame BorderColor="LightGray" Padding="15" CornerRadius="10" BackgroundColor="White">
+            <Frame BorderColor="Gray" CornerRadius="10" Padding="15" BackgroundColor="White">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Оберіть метод аналізу:" FontAttributes="Bold" TextColor="Black"/>
+
+                    <RadioButton x:Name="RbLinq" Content="LINQ to XML" IsChecked="True" GroupName="StrategyGroup"/>
+                    <RadioButton x:Name="RbDom" Content="DOM API" GroupName="StrategyGroup"/>
+                    <RadioButton x:Name="RbSax" Content="SAX API" GroupName="StrategyGroup"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BorderColor="Gray" CornerRadius="10" Padding="15" BackgroundColor="White">
                 <VerticalStackLayout Spacing="10">
-                    <Label Text="Вхід в систему (Пароль: 123)" FontAttributes="Bold" TextColor="#333"/>
+                    <Label Text="Критерії пошуку:" FontAttributes="Bold" TextColor="Black"/>
 
-                    <Entry x:Name="LoginEntry" Placeholder="Ваш логін" />
-                    <Entry x:Name="PasswordEntry" Placeholder="Пароль" IsPassword="True" />
+                    <Entry x:Name="NameEntry" Placeholder="Назва секції (напр. Basketball)" />
+                    <Entry x:Name="CoachEntry" Placeholder="Прізвище тренера" />
+                    <Entry x:Name="TimeEntry" Placeholder="Час занять" />
 
-                    <Button Text="Увійти" 
-                            Clicked="OnLoginClicked"
-                            BackgroundColor="#1877f2" TextColor="White"/>
+                    <HorizontalStackLayout Spacing="10" HorizontalOptions="Center" Margin="0,10,0,0">
+                        <Button Text="🔍 Пошук" 
+                                Clicked="OnSearchClicked" 
+                                BackgroundColor="#42b72a" 
+                                TextColor="White"
+                                WidthRequest="120"/>
+
+                        <Button Text="🧹 Clear" 
+                                Clicked="OnClearClicked" 
+                                BackgroundColor="#e4e6eb" 
+                                TextColor="Black"
+                                WidthRequest="100"/>
+                    </HorizontalStackLayout>
                 </VerticalStackLayout>
             </Frame>
 
-            <Frame BorderColor="LightGray" Padding="15" CornerRadius="10" BackgroundColor="White">
-                <VerticalStackLayout Spacing="15">
-                    <Label Text="Пошук секції" FontAttributes="Bold" TextColor="#333"/>
+            <VerticalStackLayout Spacing="5">
+                <Label Text="Результати:" FontAttributes="Bold" FontSize="18" TextColor="#333"/>
+                <Editor x:Name="ResultsEditor" 
+                        HeightRequest="200" 
+                        IsReadOnly="True" 
+                        BackgroundColor="White"
+                        Placeholder="Тут з'являться результати..." />
+            </VerticalStackLayout>
 
-                    <Entry x:Name="SearchEntry" Placeholder="Назва (напр. Basketball)" />
-                    <Button Text="Знайти та переглянути" 
-                            Clicked="OnFindClicked"
-                            BackgroundColor="#42b72a" TextColor="White"/>
-
-                    <Label x:Name="InfoLabel" 
-                           Text="Інформація про секцію з'явиться тут..." 
-                           FontSize="16" TextColor="Gray" 
-                           HorizontalOptions="Center" HorizontalTextAlignment="Center"/>
-
-                    <Button x:Name="EnrollButton"
-                            Text="ЗАПИСАТИСЬ НА СЕКЦІЮ"
-                            Clicked="OnEnrollClicked"
-                            IsEnabled="False" 
-                            FontSize="18" FontAttributes="Bold"
-                            BackgroundColor="Gray" TextColor="White" HeightRequest="60"/>
-                </VerticalStackLayout>
-            </Frame>
+            <Button Text="Вихід з програми" 
+                    Clicked="OnExitClicked" 
+                    BackgroundColor="#ff4444" 
+                    TextColor="White" 
+                    Margin="0,20,0,0"/>
 
         </VerticalStackLayout>
     </ScrollView>

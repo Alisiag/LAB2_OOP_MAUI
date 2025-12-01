@@ -1,20 +1,20 @@
-﻿
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using LAB2_OOP_MAUI.Models;
+using LAB2_OOP_MAUI.Strategies;
 
 namespace LAB2_OOP_MAUI.Controllers
 {
     public class SystemControl
     {
         private static SystemControl _instance;
-        private List<Section> _sections;
-        public User CurrentUser { get; private set; }
 
-        // Singleton
+        // 1. Посилання на алгоритм пошуку (Стратегію)
+        public ISearchStrategy CurrentStrategy { get; set; }
+
+        // 2. Шлях до файлу XML (Вкажіть реальний шлях на вашому ПК!)
+        // Для лабораторної найпростіше покласти файл на диск C: або D:
+        public string XmlFilePath { get; set; } = @"C:\Users\Admin\source\repos\LAB2_OOP_MAUI\sports.xml";
+
         public static SystemControl Instance
         {
             get
@@ -26,41 +26,15 @@ namespace LAB2_OOP_MAUI.Controllers
 
         private SystemControl()
         {
-            _sections = new List<Section>
-            {
-                new Section(101, "Basketball", "Mon 18:00"),
-                new Section(102, "Tennis", "Tue 16:00")
-            };
+            // Стратегія за замовчуванням
+            CurrentStrategy = new LinqStrategy();
         }
 
-        public bool CheckLogin(string login, string password)
+        // 3. Головний метод пошуку
+        public List<Section> FindSection(Section criteria)
         {
-            // Спрощена логіка
-            if (password == "123")
-            {
-                CurrentUser = UserFactory.CreateUser("student", login);
-                return true;
-            }
-            return false;
-        }
-
-        public Section FindSection(string name)
-        {
-            // Якщо Find не працює, додайте using System.Linq;
-            return _sections.Find(s => s.Name == name);
-        }
-
-        public bool EnrollStudent(string sectionName)
-        {
-            var section = FindSection(sectionName);
-            if (section != null && CurrentUser is Student)
-            {
-                section.AddStudent(CurrentUser.Login);
-                return true;
-            }
-            return false;
+            // Делегуємо роботу конкретній стратегії (SAX, DOM або LINQ)
+            return CurrentStrategy.Search(criteria, XmlFilePath);
         }
     }
-
-   
 }

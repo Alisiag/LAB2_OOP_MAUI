@@ -10,26 +10,21 @@ namespace LAB2_OOP_MAUI.Models
 
     public class Section
     {
-        public int Id { get; set; }
         public string Name { get; set; }
-        public string Schedule { get; set; }
-        private List<string> _students = new List<string>();
+        public string Coach { get; set; }
+        public string Time { get; set; }
+        public string Places { get; set; }
+        public List<string> Students = new List<string>();
 
-        public Section(int id, string name, string schedule)
-        {
-            Id = id;
-            Name = name;
-            Schedule = schedule;
-        }
+        public Section() { }
+        
 
-        public void AddStudent(string studentName)
-        {
-            _students.Add(studentName);
-        }
+        
 
         public string GetDetails()
         {
-            return $"Sectin: {Name}, Time {Schedule}, Instructor: ";// Instructor details to be added later
+            string studentList = Students.Count > 0 ? string.Join(", ", Students) : "Немає";
+            return $"Секція: {Name}\nТренер: {Coach}\nЧас: {Time}\nСтуденти: {studentList}";
         }
     }
 
