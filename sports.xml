@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SportComplex>
+  <Section Name="Basketball" Coach="Ivanov" Time="18:30" Places="20">
+    <Student Name="Petrenko" Course="2" />
+    <Student Name="Sidorov" Course="3" />
+    <Student Name="Ivanov" Course="1" />
+  </Section>
+  <Section Name="Volleyball" Coach="Petrov" Time="17:00" Places="15">
+    <Student Name="Kovalenko" Course="1" />
+  </Section>
+  <Section Name="Tennis" Coach="Smith" Time="16:00">
+    <Student Name="Bondar" Course="4" />
+    <Student Name="Ivanov" Course="1" />
+    <Student Name="Ivanov" Course="1" />
+  </Section>
+</SportComplex>

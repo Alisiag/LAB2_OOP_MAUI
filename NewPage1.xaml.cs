@@ -1,96 +1,142 @@
-using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Maui.Controls;
 using LAB2_OOP_MAUI.Controllers;
 using LAB2_OOP_MAUI.Models;
+using LAB2_OOP_MAUI.Strategies;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Maui.Controls;
 
 namespace LAB2_OOP_MAUI;
 
 public partial class NewPage1 : ContentPage
 {
-    // Змінна для збереження секції, яку ми зараз переглядаємо
-    private Section _currentSectionViewed;
+    // Збережемо назву секції, яку знайшли, щоб знати куди записуватись
+    private string _foundSectionName = null;
 
     public NewPage1()
     {
         InitializeComponent();
     }
 
-    // === Обробник кнопки "Увійти" ===
-    private async void OnLoginClicked(object sender, EventArgs e)
+    // === 1. Логін (Просто зберігаємо ім'я) ===
+    private void OnLoginClicked(object sender, EventArgs e)
     {
         string login = LoginEntry.Text;
-        string pass = PasswordEntry.Text;
+        string password = PasswordEntry.Text;
 
-        // Викликаємо наш Singleton контролер
-        bool success = SystemControl.Instance.CheckLogin(login, pass);
-
-        if (success)
+        // Перевірка на порожні поля
+        if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
         {
-            var role = SystemControl.Instance.CurrentUser.GetRole();
-            await DisplayAlert("Успіх", $"Вітаємо, {login}! Ви увійшли як {role}.", "ОК");
-        }
-        else
-        {
-            await DisplayAlert("Помилка", "Невірний логін або пароль.", "ОК");
-        }
-    }
-
-    // === Обробник кнопки "Знайти та переглянути" ===
-    private async void OnFindClicked(object sender, EventArgs e)
-    {
-        string searchName = SearchEntry.Text;
-
-        // Звертаємося до контролера для пошуку
-        _currentSectionViewed = SystemControl.Instance.FindSection(searchName);
-
-        if (_currentSectionViewed != null)
-        {
-            // Оновлюємо Label інформацією з моделі
-            InfoLabel.Text = _currentSectionViewed.GetDetails();
-            InfoLabel.TextColor = Colors.Black;
-
-            // Вмикаємо кнопку запису і робимо її зеленою
-            EnrollButton.IsEnabled = true;
-            EnrollButton.BackgroundColor = Colors.Green;
-        }
-        else
-        {
-            InfoLabel.Text = $"Секцію '{searchName}' не знайдено.";
-            InfoLabel.TextColor = Colors.Red;
-
-            // Вимикаємо кнопку запису
-            EnrollButton.IsEnabled = false;
-            EnrollButton.BackgroundColor = Colors.Gray;
-            await DisplayAlert("Увага", "Секцію не знайдено. Спробуйте 'Basketball' або 'Tennis'", "ОК");
-        }
-    }
-
-    // === Обробник кнопки "ЗАПИСАТИСЬ" ===
-    private async void OnEnrollClicked(object sender, EventArgs e)
-    {
-        // Проста перевірка на "магічну кнопку" - якщо секція не вибрана, нічого не робимо
-        if (_currentSectionViewed == null) return;
-
-        // Перевіряємо, чи користувач взагалі увійшов
-        if (SystemControl.Instance.CurrentUser == null)
-        {
-            await DisplayAlert("Помилка", "Спочатку увійдіть в систему!", "ОК");
+            DisplayAlert("Помилка", "Будь ласка, заповніть логін та пароль!", "ОК");
             return;
         }
 
-        // Делегуємо логіку запису контролеру
-        bool success = SystemControl.Instance.EnrollStudent(_currentSectionViewed.Name);
-
-        if (success)
+        // Проста перевірка пароля (можна змінити на будь-який)
+        if (password == "123")
         {
-            await DisplayAlert("Ура!", "Вас успішно записано на секцію!", "Чудово");
-            // Оновлюємо інформацію на екрані, щоб показати нову кількість студентів
-            InfoLabel.Text = _currentSectionViewed.GetDetails();
+            SystemControl.Instance.CurrentUserName = login;
+
+            // Візуальне оновлення
+            UserStatusLabel.Text = $"Вітаємо, {login}! Ви авторизовані.";
+            UserStatusLabel.TextColor = Colors.Green;
+
+            // Очистимо поле пароля для безпеки
+            PasswordEntry.Text = string.Empty;
+
+            DisplayAlert("Вхід успішний", "Тепер ви можете шукати секції та записуватись на них.", "Чудово");
         }
         else
         {
-            // Якщо контролер повернув false, значить користувач не студент
-            await DisplayAlert("Помилка", "Записуватись можуть тільки студенти.", "ОК");
+            DisplayAlert("Помилка входу", "Невірний пароль! Спробуйте '123'.", "ОК");
+        }
+    }
+
+    // === 2. Пошук ===
+    private async void OnSearchClicked(object sender, EventArgs e)
+    {
+        // Вибір стратегії
+        if (RbLinq.IsChecked) SystemControl.Instance.CurrentStrategy = new LinqStrategy();
+        else if (RbDom.IsChecked) SystemControl.Instance.CurrentStrategy = new DomStrategy();
+        else if (RbSax.IsChecked) SystemControl.Instance.CurrentStrategy = new SaxStrategy();
+
+        Section criteria = new Section
+        {
+            Name = NameEntry.Text,
+            Coach = CoachEntry.Text,
+            Time = TimeEntry.Text
+        };
+
+        var results = SystemControl.Instance.FindSection(criteria);
+
+        if (results.Count > 0)
+        {
+            string output = "";
+            foreach (var sec in results)
+            {
+                output += sec.GetDetails() + "\n-----------------\n";
+            }
+            ResultsEditor.Text = output;
+
+            // Запам'ятовуємо першу знайдену секцію для запису
+            _foundSectionName = results[0].Name;
+
+            // Активуємо кнопку запису
+            EnrollButton.IsEnabled = true;
+            EnrollButton.BackgroundColor = Colors.Blue;
+            EnrollButton.Text = $"ЗАПИСАТИСЬ НА {_foundSectionName.ToUpper()}";
+        }
+        else
+        {
+            ResultsEditor.Text = "Нічого не знайдено.";
+            EnrollButton.IsEnabled = false;
+            EnrollButton.BackgroundColor = Colors.Gray;
+            _foundSectionName = null;
+            await DisplayAlert("Інфо", "Секцій не знайдено", "ОК");
+        }
+    }
+
+    // === 3. Запис на секцію (Зміна XML) ===
+    private async void OnEnrollClicked(object sender, EventArgs e)
+    {
+        if (string.IsNullOrEmpty(SystemControl.Instance.CurrentUserName))
+        {
+            await DisplayAlert("Помилка", "Спочатку увійдіть (введіть ім'я зверху)!", "ОК");
+            return;
+        }
+
+        if (_foundSectionName != null)
+        {
+            bool result = SystemControl.Instance.EnrollStudent(_foundSectionName);
+            if (result)
+            {
+                await DisplayAlert("Успіх", $"Ви записані на {_foundSectionName}!\nДані збережено у XML.", "Чудово");
+                // Очистимо пошук, щоб користувач побачив оновлені дані при наступному пошуку
+                OnClearClicked(sender, e);
+            }
+            else
+            {
+                await DisplayAlert("Помилка", "Не вдалося записати у файл.", "ОК");
+            }
+        }
+    }
+
+    // === 4. Очищення ===
+    private void OnClearClicked(object sender, EventArgs e)
+    {
+        NameEntry.Text = string.Empty;
+        CoachEntry.Text = string.Empty;
+        TimeEntry.Text = string.Empty;
+        ResultsEditor.Text = string.Empty;
+        EnrollButton.IsEnabled = false;
+        EnrollButton.BackgroundColor = Colors.Gray;
+        EnrollButton.Text = "ЗАПИСАТИСЬ";
+        _foundSectionName = null;
+    }
+
+    // === 5. Вихід ===
+    private async void OnExitClicked(object sender, EventArgs e)
+    {
+        if (await DisplayAlert("Вихід", "Завершити роботу?", "Так", "Ні"))
+        {
+            System.Environment.Exit(0);
         }
     }
 }
