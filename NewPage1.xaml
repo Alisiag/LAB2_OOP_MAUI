@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LAB2_OOP_MAUI.NewPage1"
+             BackgroundColor="#f0f2f5">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+
+            <Label Text="Система запису на секції"
+                   FontSize="22" FontAttributes="Bold" HorizontalOptions="Center" />
+
+            <Frame BorderColor="LightGray" Padding="15" CornerRadius="10" BackgroundColor="White">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Вхід в систему (Пароль: 123)" FontAttributes="Bold" TextColor="#333"/>
+
+                    <Entry x:Name="LoginEntry" Placeholder="Ваш логін" />
+                    <Entry x:Name="PasswordEntry" Placeholder="Пароль" IsPassword="True" />
+
+                    <Button Text="Увійти" 
+                            Clicked="OnLoginClicked"
+                            BackgroundColor="#1877f2" TextColor="White"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BorderColor="LightGray" Padding="15" CornerRadius="10" BackgroundColor="White">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Пошук секції" FontAttributes="Bold" TextColor="#333"/>
+
+                    <Entry x:Name="SearchEntry" Placeholder="Назва (напр. Basketball)" />
+                    <Button Text="Знайти та переглянути" 
+                            Clicked="OnFindClicked"
+                            BackgroundColor="#42b72a" TextColor="White"/>
+
+                    <Label x:Name="InfoLabel" 
+                           Text="Інформація про секцію з'явиться тут..." 
+                           FontSize="16" TextColor="Gray" 
+                           HorizontalOptions="Center" HorizontalTextAlignment="Center"/>
+
+                    <Button x:Name="EnrollButton"
+                            Text="ЗАПИСАТИСЬ НА СЕКЦІЮ"
+                            Clicked="OnEnrollClicked"
+                            IsEnabled="False" 
+                            FontSize="18" FontAttributes="Bold"
+                            BackgroundColor="Gray" TextColor="White" HeightRequest="60"/>
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
