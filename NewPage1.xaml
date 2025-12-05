@@ -16,10 +16,10 @@
 
             <Frame BorderColor="#1565c0" CornerRadius="10" Padding="15" BackgroundColor="#e3f2fd">
                 <VerticalStackLayout Spacing="10">
-                    <Label Text="Авторизація студента" FontAttributes="Bold" TextColor="#1565c0" HorizontalOptions="Center"/>
+                    <Label Text="Авторизація" FontAttributes="Bold" TextColor="#1565c0" HorizontalOptions="Center"/>
 
                     <Entry x:Name="LoginEntry" 
-                           Placeholder="Введіть ваше ПІБ" 
+                           Placeholder="Введіть ваш login" 
                            TextColor="Black" 
                            PlaceholderColor="Gray"
                            BackgroundColor="White"/>
@@ -45,7 +45,30 @@
                 </VerticalStackLayout>
             </Frame>
 
+            <Button Text="Подивитись мій розклад" 
+                Clicked="OnMyScheduleClicked" 
+                BackgroundColor="#1877f2" 
+                TextColor="White" 
+                Margin="0,20,0,0"/>
             <Frame BorderColor="Gray" CornerRadius="10" Padding="15" BackgroundColor="White">
+                <VerticalStackLayout Spacing="10">
+                   
+                            <Label Text="Мій розклад:" FontAttributes="Bold" TextColor="Black"/>
+
+                            <Editor x:Name="MyScheduleEditor"
+                                HeightRequest="100"
+                                IsReadOnly="True"
+                                BackgroundColor="#f0f2f5"
+                                TextColor="Black"
+                                Placeholder="Тут з'явиться твій розклад..."/>
+
+                        
+                </VerticalStackLayout>
+            </Frame>
+
+
+
+            <Frame x:Name="StrategyFrame" BorderColor="Gray" CornerRadius="10" Padding="15" BackgroundColor="White">
                 <VerticalStackLayout Spacing="5">
                     <Label Text="Метод пошуку:" FontAttributes="Bold" TextColor="Black"/>
 
@@ -55,7 +78,7 @@
                 </VerticalStackLayout>
             </Frame>
 
-            <Frame BorderColor="Gray" CornerRadius="10" Padding="15" BackgroundColor="White">
+            <Frame x:Name="SearchFrame" BorderColor="Gray" CornerRadius="10" Padding="15" BackgroundColor="White">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="Параметри секції:" FontAttributes="Bold" TextColor="Black"/>
 
@@ -64,13 +87,13 @@
                     <Entry x:Name="TimeEntry" Placeholder="Час" TextColor="Black"/>
 
                     <HorizontalStackLayout Spacing="10" HorizontalOptions="Center" Margin="0,10,0,0">
-                        <Button Text="🔍 Пошук" 
+                        <Button Text=" Пошук" 
                                 Clicked="OnSearchClicked" 
                                 BackgroundColor="#42b72a" 
                                 TextColor="White" 
                                 WidthRequest="120"/>
 
-                        <Button Text="🧹 Clear" 
+                        <Button Text=" Clear" 
                                 Clicked="OnClearClicked" 
                                 BackgroundColor="#e4e6eb" 
                                 TextColor="Black" 
@@ -79,7 +102,7 @@
                 </VerticalStackLayout>
             </Frame>
 
-            <VerticalStackLayout Spacing="5">
+            <VerticalStackLayout x:Name="ResultsLayout" Spacing="5">
                 <Label Text="Результати:" FontAttributes="Bold" TextColor="#333"/>
                 <Editor x:Name="ResultsEditor" 
                         HeightRequest="150" 
@@ -88,15 +111,13 @@
                         TextColor="Black"/>
             </VerticalStackLayout>
 
-            <Button x:Name="EnrollButton"
-                    Text="ЗАПИСАТИСЬ НА СЕКЦІЮ" 
-                    Clicked="OnEnrollClicked" 
-                    IsEnabled="False"
-                    BackgroundColor="Gray" 
-                    TextColor="White" 
-                    FontAttributes="Bold"
-                    HeightRequest="50"
-                    CornerRadius="10"/>
+            <Button Text="Зберегти звіт у HTML" 
+                Clicked="OnHtmlClicked" 
+                BackgroundColor="Orange" 
+                TextColor="White" 
+                FontAttributes="Bold"
+                Margin="0,10,0,0"/>
+
 
             <Button Text="Вихід з програми" 
                     Clicked="OnExitClicked" 

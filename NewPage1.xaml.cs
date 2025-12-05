@@ -8,7 +8,6 @@ namespace LAB2_OOP_MAUI;
 
 public partial class NewPage1 : ContentPage
 {
-    // Збережемо назву секції, яку знайшли, щоб знати куди записуватись
     private string _foundSectionName = null;
 
     public NewPage1()
@@ -16,43 +15,65 @@ public partial class NewPage1 : ContentPage
         InitializeComponent();
     }
 
-    // === 1. Логін (Просто зберігаємо ім'я) ===
     private void OnLoginClicked(object sender, EventArgs e)
     {
         string login = LoginEntry.Text;
         string password = PasswordEntry.Text;
 
-        // Перевірка на порожні поля
         if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
         {
             DisplayAlert("Помилка", "Будь ласка, заповніть логін та пароль!", "ОК");
             return;
         }
+        
 
-        // Проста перевірка пароля (можна змінити на будь-який)
-        if (password == "123")
+        if(!SystemControl.Instance.CheckLogin(login, password))
         {
-            SystemControl.Instance.CurrentUserName = login;
-
-            // Візуальне оновлення
-            UserStatusLabel.Text = $"Вітаємо, {login}! Ви авторизовані.";
-            UserStatusLabel.TextColor = Colors.Green;
-
-            // Очистимо поле пароля для безпеки
-            PasswordEntry.Text = string.Empty;
-
-            DisplayAlert("Вхід успішний", "Тепер ви можете шукати секції та записуватись на них.", "Чудово");
+            DisplayAlert("Помилка", "Невірний логін або пароль!", "ОК");
+            return;
+        }
+        string role;
+        if(SystemControl.Instance.CurrentUserRole == UserRole.Student)
+        {
+            role =  "Студент";
+        }
+       else if(SystemControl.Instance.CurrentUserRole == UserRole.Coach)
+        {
+            role = "Тренер";
         }
         else
         {
-            DisplayAlert("Помилка входу", "Невірний пароль! Спробуйте '123'.", "ОК");
+            role = "Гість";
         }
+        if(SystemControl.Instance.CurrentUserRole == UserRole.Coach)
+        {
+            StrategyFrame.IsVisible = false;
+            SearchFrame.IsVisible = false;
+            ResultsLayout.IsVisible = false;
+        }
+        else 
+        {
+   
+            StrategyFrame.IsVisible = true;
+            SearchFrame.IsVisible = true;
+            ResultsLayout.IsVisible = true;
+            
+        }
+        SystemControl.Instance.CurrentUserName = login;
+        DisplayAlert("Вхід успішний", $"Ви увійшли як {role}", "Чудово");
+        UserStatusLabel.TextColor = Colors.Green;
+        UserStatusLabel.Text = $"Вітаємо, {login}!";
     }
 
-    // === 2. Пошук ===
+        
+    
+
+        
+
+ 
     private async void OnSearchClicked(object sender, EventArgs e)
     {
-        // Вибір стратегії
+
         if (RbLinq.IsChecked) SystemControl.Instance.CurrentStrategy = new LinqStrategy();
         else if (RbDom.IsChecked) SystemControl.Instance.CurrentStrategy = new DomStrategy();
         else if (RbSax.IsChecked) SystemControl.Instance.CurrentStrategy = new SaxStrategy();
@@ -63,6 +84,13 @@ public partial class NewPage1 : ContentPage
             Coach = CoachEntry.Text,
             Time = TimeEntry.Text
         };
+        if (string.IsNullOrWhiteSpace(criteria.Name) &&
+            string.IsNullOrWhiteSpace(criteria.Coach) &&
+            string.IsNullOrWhiteSpace(criteria.Time))
+        {
+            await DisplayAlert("Помилка", "Будь ласка, введіть хоча б один критерій пошуку!", "ОК");
+            return;
+        }
 
         var results = SystemControl.Instance.FindSection(criteria);
 
@@ -75,63 +103,31 @@ public partial class NewPage1 : ContentPage
             }
             ResultsEditor.Text = output;
 
-            // Запам'ятовуємо першу знайдену секцію для запису
             _foundSectionName = results[0].Name;
 
-            // Активуємо кнопку запису
-            EnrollButton.IsEnabled = true;
-            EnrollButton.BackgroundColor = Colors.Blue;
-            EnrollButton.Text = $"ЗАПИСАТИСЬ НА {_foundSectionName.ToUpper()}";
+ 
         }
         else
         {
             ResultsEditor.Text = "Нічого не знайдено.";
-            EnrollButton.IsEnabled = false;
-            EnrollButton.BackgroundColor = Colors.Gray;
+
             _foundSectionName = null;
             await DisplayAlert("Інфо", "Секцій не знайдено", "ОК");
         }
     }
 
-    // === 3. Запис на секцію (Зміна XML) ===
-    private async void OnEnrollClicked(object sender, EventArgs e)
-    {
-        if (string.IsNullOrEmpty(SystemControl.Instance.CurrentUserName))
-        {
-            await DisplayAlert("Помилка", "Спочатку увійдіть (введіть ім'я зверху)!", "ОК");
-            return;
-        }
+   
 
-        if (_foundSectionName != null)
-        {
-            bool result = SystemControl.Instance.EnrollStudent(_foundSectionName);
-            if (result)
-            {
-                await DisplayAlert("Успіх", $"Ви записані на {_foundSectionName}!\nДані збережено у XML.", "Чудово");
-                // Очистимо пошук, щоб користувач побачив оновлені дані при наступному пошуку
-                OnClearClicked(sender, e);
-            }
-            else
-            {
-                await DisplayAlert("Помилка", "Не вдалося записати у файл.", "ОК");
-            }
-        }
-    }
-
-    // === 4. Очищення ===
     private void OnClearClicked(object sender, EventArgs e)
     {
         NameEntry.Text = string.Empty;
         CoachEntry.Text = string.Empty;
         TimeEntry.Text = string.Empty;
         ResultsEditor.Text = string.Empty;
-        EnrollButton.IsEnabled = false;
-        EnrollButton.BackgroundColor = Colors.Gray;
-        EnrollButton.Text = "ЗАПИСАТИСЬ";
+
         _foundSectionName = null;
     }
 
-    // === 5. Вихід ===
     private async void OnExitClicked(object sender, EventArgs e)
     {
         if (await DisplayAlert("Вихід", "Завершити роботу?", "Так", "Ні"))
@@ -139,4 +135,36 @@ public partial class NewPage1 : ContentPage
             System.Environment.Exit(0);
         }
     }
+
+    private async void OnMyScheduleClicked(object sender, EventArgs e)
+    {
+
+        if (string.IsNullOrEmpty(SystemControl.Instance.CurrentUserName))
+        {
+            await DisplayAlert("Помилка", "Спочатку увійдіть у систему!", "ОК");
+            return;
+        }
+
+
+        string schedule = SystemControl.Instance.GetMySchedule();
+
+    
+        MyScheduleEditor.Text = schedule;
+
+    
+        if (schedule.Contains("Помилка") || schedule.Contains("немає"))
+        {
+            await DisplayAlert("Розклад", schedule, "ОК");
+        }
+    }
+
+    private async void OnHtmlClicked(object sender, EventArgs e)
+    {
+  
+        SystemControl.Instance.TransformToHtml();
+
+  
+        await DisplayAlert("Успіх", "Файл report.html успішно створено!", "ОК");
+    }
+
 }

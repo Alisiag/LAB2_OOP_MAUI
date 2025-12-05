@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml; // Бібліотека для DOM
+using System.Xml; 
 using LAB2_OOP_MAUI.Models;
 
 namespace LAB2_OOP_MAUI.Strategies
@@ -17,21 +17,19 @@ namespace LAB2_OOP_MAUI.Strategies
 
             try
             {
-                doc.Load(filePath); // Завантажуємо все дерево в пам'ять
+                doc.Load(filePath);
 
-                // Отримуємо всі вузли <Section>
+                
                 XmlNodeList nodes = doc.GetElementsByTagName("Section");
 
                 foreach (XmlNode node in nodes)
                 {
-                    // Отримуємо атрибути
+                    
                     string name = node.Attributes["Name"]?.Value;
                     string coach = node.Attributes["Coach"]?.Value;
                     string time = node.Attributes["Time"]?.Value;
                     string places = node.Attributes["Places"]?.Value;
 
-                    // Перевірка критеріїв (Фільтрація)
-                    // Якщо критерій пустий АБО збігається з даними у файлі
                     bool matchName = string.IsNullOrEmpty(criteria.Name) || name == criteria.Name;
                     bool matchCoach = string.IsNullOrEmpty(criteria.Coach) || coach == criteria.Coach;
                     bool matchTime = string.IsNullOrEmpty(criteria.Time) || time == criteria.Time;
@@ -46,7 +44,6 @@ namespace LAB2_OOP_MAUI.Strategies
                             Places = places
                         };
 
-                        // Зчитуємо студентів (дочірні вузли)
                         foreach (XmlNode child in node.ChildNodes)
                         {
                             if (child.Name == "Student")
@@ -60,7 +57,6 @@ namespace LAB2_OOP_MAUI.Strategies
             }
             catch (Exception ex)
             {
-                // Обробка помилок (файл не знайдено тощо)
             }
 
             return results;
