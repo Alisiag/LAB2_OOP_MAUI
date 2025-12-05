@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml; 
+using System.Xml; // Бібліотека для DOM
 using LAB2_OOP_MAUI.Models;
 
 namespace LAB2_OOP_MAUI.Strategies
@@ -18,20 +15,30 @@ namespace LAB2_OOP_MAUI.Strategies
             try
             {
                 doc.Load(filePath);
-
-                
                 XmlNodeList nodes = doc.GetElementsByTagName("Section");
 
                 foreach (XmlNode node in nodes)
                 {
-                    
+                    // 1. Читаємо атрибути самої секції
                     string name = node.Attributes["Name"]?.Value;
-                    string coach = node.Attributes["Coach"]?.Value;
                     string time = node.Attributes["Time"]?.Value;
                     string places = node.Attributes["Places"]?.Value;
 
+                    // 2. Шукаємо ім'я тренера у вкладеному тегу <Coach>
+                    string coachName = "";
+                    foreach (XmlNode child in node.ChildNodes)
+                    {
+                        if (child.Name == "Coach")
+                        {
+                            coachName = child.Attributes["Name"]?.Value;
+                            break; // Знайшли тренера - виходимо з внутрішнього циклу
+                        }
+                    }
+
+                    // 3. Перевіряємо критерії (Фільтрація)
+                    // Важливо: перевіряємо coachName, який знайшли всередині
                     bool matchName = string.IsNullOrEmpty(criteria.Name) || name == criteria.Name;
-                    bool matchCoach = string.IsNullOrEmpty(criteria.Coach) || coach == criteria.Coach;
+                    bool matchCoach = string.IsNullOrEmpty(criteria.Coach) || coachName == criteria.Coach;
                     bool matchTime = string.IsNullOrEmpty(criteria.Time) || time == criteria.Time;
 
                     if (matchName && matchCoach && matchTime)
@@ -39,11 +46,12 @@ namespace LAB2_OOP_MAUI.Strategies
                         Section s = new Section
                         {
                             Name = name,
-                            Coach = coach,
+                            Coach = coachName, // Записуємо знайдене ім'я
                             Time = time,
                             Places = places
                         };
 
+                        // 4. Додаємо студентів
                         foreach (XmlNode child in node.ChildNodes)
                         {
                             if (child.Name == "Student")
@@ -57,6 +65,7 @@ namespace LAB2_OOP_MAUI.Strategies
             }
             catch (Exception ex)
             {
+                // Тут можна обробити помилку
             }
 
             return results;

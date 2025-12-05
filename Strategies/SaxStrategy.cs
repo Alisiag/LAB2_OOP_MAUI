@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml; 
+﻿using System.Collections.Generic;
+using System.Xml; // Бібліотека для SAX (XmlReader)
 using LAB2_OOP_MAUI.Models;
 
 namespace LAB2_OOP_MAUI.Strategies
@@ -13,51 +9,52 @@ namespace LAB2_OOP_MAUI.Strategies
         public List<Section> Search(Section criteria, string filePath)
         {
             var results = new List<Section>();
-            Section currentSection = null; 
+            Section currentSection = null;
 
             try
             {
                 using (XmlReader reader = XmlReader.Create(filePath))
                 {
-                    while (reader.Read()) 
+                    while (reader.Read())
                     {
+
                         if (reader.NodeType == XmlNodeType.Element && reader.Name == "Section")
                         {
-                            string name = reader.GetAttribute("Name");
-                            string coach = reader.GetAttribute("Coach");
-                            string time = reader.GetAttribute("Time");
-                            string places = reader.GetAttribute("Places");
+                            currentSection = new Section();
+                            currentSection.Name = reader.GetAttribute("Name");
+                            currentSection.Time = reader.GetAttribute("Time");
+                            currentSection.Places = reader.GetAttribute("Places");
 
-                            bool matchName = string.IsNullOrEmpty(criteria.Name) || name == criteria.Name;
-                            bool matchCoach = string.IsNullOrEmpty(criteria.Coach) || coach == criteria.Coach;
-                            bool matchTime = string.IsNullOrEmpty(criteria.Time) || time == criteria.Time;
-
-                            if (matchName && matchCoach && matchTime)
-                            {
-                                currentSection = new Section
-                                {
-                                    Name = name,
-                                    Coach = coach,
-                                    Time = time,
-                                    Places = places
-                                };
-                            }
-                            else
-                            {
-                                currentSection = null; 
-                            }
                         }
+
+                        // 2. Знайшли тег Coach всередині секції
+                        else if (reader.NodeType == XmlNodeType.Element && reader.Name == "Coach" && currentSection != null)
+                        {
+                            currentSection.Coach = reader.GetAttribute("Name");
+                        }
+
+                        // 3. Знайшли тег Student
                         else if (reader.NodeType == XmlNodeType.Element && reader.Name == "Student" && currentSection != null)
                         {
                             currentSection.Students.Add(reader.GetAttribute("Name"));
                         }
-                        else if (reader.NodeType == XmlNodeType.EndElement && reader.Name == "Section")
+
+                      
+                        else if (reader.NodeType == XmlNodeType.EndElement && reader.Name == "Section" && currentSection != null)
                         {
-                            if (currentSection != null)
+                            // Перевірка
+                            bool matchName = string.IsNullOrEmpty(criteria.Name) || currentSection.Name == criteria.Name;
+                            bool matchCoach = string.IsNullOrEmpty(criteria.Coach) || currentSection.Coach == criteria.Coach;
+                            bool matchTime = string.IsNullOrEmpty(criteria.Time) || currentSection.Time == criteria.Time;
+
+                         
+                            if (matchName && matchCoach && matchTime)
                             {
                                 results.Add(currentSection);
-                                currentSection = null;
                             }
+
+                           
+                            currentSection = null;
                         }
                     }
                 }

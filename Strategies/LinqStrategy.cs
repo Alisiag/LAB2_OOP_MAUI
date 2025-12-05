@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq; 
+using System.Xml.Linq;
 using LAB2_OOP_MAUI.Models;
 
 namespace LAB2_OOP_MAUI.Strategies
@@ -15,9 +16,13 @@ namespace LAB2_OOP_MAUI.Strategies
             {
                 XDocument doc = XDocument.Load(filePath);
 
+                
                 var query = from section in doc.Descendants("Section")
+                            let coachElement = section.Element("Coach") 
+                            let coachName = (string)coachElement?.Attribute("Name") 
+
                             where (string.IsNullOrEmpty(criteria.Name) || (string)section.Attribute("Name") == criteria.Name)
-                               && (string.IsNullOrEmpty(criteria.Coach) || (string)section.Attribute("Coach") == criteria.Coach)
+                               && (string.IsNullOrEmpty(criteria.Coach) || coachName == criteria.Coach) 
                                && (string.IsNullOrEmpty(criteria.Time) || (string)section.Attribute("Time") == criteria.Time)
                             select section;
 
@@ -25,7 +30,11 @@ namespace LAB2_OOP_MAUI.Strategies
                 {
                     Section s = new Section();
                     s.Name = (string)xElement.Attribute("Name");
-                    s.Coach = (string)xElement.Attribute("Coach");
+
+                  
+                    var coachNode = xElement.Element("Coach");
+                    s.Coach = (string)coachNode?.Attribute("Name");
+
                     s.Time = (string)xElement.Attribute("Time");
                     s.Places = (string)xElement.Attribute("Places");
 
@@ -39,6 +48,7 @@ namespace LAB2_OOP_MAUI.Strategies
             }
             catch (Exception ex)
             {
+              
             }
 
             return results;
