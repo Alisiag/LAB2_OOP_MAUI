@@ -74,7 +74,7 @@ namespace LAB2_OOP_MAUI.Controllers
             try
             {
                 XDocument doc = XDocument.Load(XmlFilePath);
-                // Створимо список, куди будемо складати знайдені секції
+         
                 List<string> resultList = new List<string>();
 
                 IEnumerable<XElement> sections = null;
@@ -82,38 +82,37 @@ namespace LAB2_OOP_MAUI.Controllers
                 switch (CurrentUserRole)
                 {
                     case UserRole.Student:
-                        // Ваш запит правильний, ми просто зберігаємо його у змінну sections
+               
                         sections = doc.Descendants("Section")
                             .Where(s => s.Elements("Student")
                                          .Any(st => (string)st.Attribute("Name") == CurrentUserName));
                         break;
 
                     case UserRole.Coach:
-                        // Ваш запит для тренера
+                   
                         sections = doc.Descendants("Section")
                             .Where(s => s.Elements("Coach")
                                          .Any(c => (string)c.Attribute("Name") == CurrentUserName));
                         break;
                 }
 
-                // Якщо нічого не знайшли або роль не та
+     
                 if (sections == null || !sections.Any())
                 {
                     return "У вас немає занять.";
                 }
 
-                // === ГОЛОВНЕ ВИПРАВЛЕННЯ ===
-                // Проходимо по кожній знайденій секції і формуємо красивий рядок
+              
                 foreach (var sec in sections)
                 {
                     string name = (string)sec.Attribute("Name");
                     string time = (string)sec.Attribute("Time");
 
-                    // Додаємо в список: "Basketball - 18:30"
+
                     resultList.Add($"{name} - {time}");
                 }
 
-                // Об'єднуємо весь список в один текст через перенос рядка
+              
                 return string.Join("\n", resultList);
             }
             catch
@@ -122,28 +121,27 @@ namespace LAB2_OOP_MAUI.Controllers
             }
         }
 
-        // Метод генерації HTML звіту
+     
         public void TransformToHtml()
         {
             try
             {
-                // Шляхи до файлів (вони мають лежати поруч з XML)
-                // Припускаємо, що style.xsl лежить там же, де і sports.xml
+         
                 string xslPath = XmlFilePath.Replace("sports.xml", "style.xsl");
                 string htmlPath = XmlFilePath.Replace("sports.xml", "report.html");
 
-                // Створюємо трансформер
+               
                 XslCompiledTransform transform = new XslCompiledTransform();
 
-                // 1. Завантажуємо стиль (XSL)
+            
                 transform.Load(xslPath);
 
-                // 2. Виконуємо трансформацію (Вхід XML -> Вихід HTML)
+             
                 transform.Transform(XmlFilePath, htmlPath);
             }
             catch (Exception ex)
             {
-                // Якщо файлу style.xsl немає, нічого страшного, просто не створиться звіт
+           
             }
         }
     }

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Xml; // Бібліотека для SAX (XmlReader)
+using System.Xml; 
 using LAB2_OOP_MAUI.Models;
 
 namespace LAB2_OOP_MAUI.Strategies
@@ -27,13 +27,12 @@ namespace LAB2_OOP_MAUI.Strategies
 
                         }
 
-                        // 2. Знайшли тег Coach всередині секції
+                   
                         else if (reader.NodeType == XmlNodeType.Element && reader.Name == "Coach" && currentSection != null)
                         {
                             currentSection.Coach = reader.GetAttribute("Name");
                         }
 
-                        // 3. Знайшли тег Student
                         else if (reader.NodeType == XmlNodeType.Element && reader.Name == "Student" && currentSection != null)
                         {
                             currentSection.Students.Add(reader.GetAttribute("Name"));
@@ -42,7 +41,7 @@ namespace LAB2_OOP_MAUI.Strategies
                       
                         else if (reader.NodeType == XmlNodeType.EndElement && reader.Name == "Section" && currentSection != null)
                         {
-                            // Перевірка
+                       
                             bool matchName = string.IsNullOrEmpty(criteria.Name) || currentSection.Name == criteria.Name;
                             bool matchCoach = string.IsNullOrEmpty(criteria.Coach) || currentSection.Coach == criteria.Coach;
                             bool matchTime = string.IsNullOrEmpty(criteria.Time) || currentSection.Time == criteria.Time;
