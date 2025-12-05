@@ -24,7 +24,7 @@ namespace LAB2_OOP_MAUI.Models
         public string GetDetails()
         {
             string studentList = Students.Count > 0 ? string.Join(", ", Students) : "Немає";
-            return $"Секція: {Name}\nТренер: {Coach}\nЧас: {Time}\nСтуденти: {studentList}";
+            return $"Секція: {Name}\nТренер: {Coach}\nЧас: {Time}\nМісць: {Places}\nСтуденти: {studentList}";
         }
     }
 
