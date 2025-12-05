@@ -2,7 +2,7 @@
 using Microsoft.Maui.Controls.Hosting;
 using Microsoft.Maui.Hosting;
 
-namespace LAB2_OOP_MAUI; // Важливо: цей namespace має бути саме таким!
+namespace LAB2_OOP_MAUI; 
 
 public static class MauiProgram
 {

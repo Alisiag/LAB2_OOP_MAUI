@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml; // Бібліотека для XmlReader (SAX)
+using System.Xml; 
 using LAB2_OOP_MAUI.Models;
 
 namespace LAB2_OOP_MAUI.Strategies
@@ -13,15 +13,14 @@ namespace LAB2_OOP_MAUI.Strategies
         public List<Section> Search(Section criteria, string filePath)
         {
             var results = new List<Section>();
-            Section currentSection = null; // Тимчасова змінна
+            Section currentSection = null; 
 
             try
             {
                 using (XmlReader reader = XmlReader.Create(filePath))
                 {
-                    while (reader.Read()) // Читаємо файл рядок за рядком
+                    while (reader.Read()) 
                     {
-                        // Якщо знайшли відкриваючий тег <Section>
                         if (reader.NodeType == XmlNodeType.Element && reader.Name == "Section")
                         {
                             string name = reader.GetAttribute("Name");
@@ -29,7 +28,6 @@ namespace LAB2_OOP_MAUI.Strategies
                             string time = reader.GetAttribute("Time");
                             string places = reader.GetAttribute("Places");
 
-                            // Перевірка фільтрів
                             bool matchName = string.IsNullOrEmpty(criteria.Name) || name == criteria.Name;
                             bool matchCoach = string.IsNullOrEmpty(criteria.Coach) || coach == criteria.Coach;
                             bool matchTime = string.IsNullOrEmpty(criteria.Time) || time == criteria.Time;
@@ -46,15 +44,13 @@ namespace LAB2_OOP_MAUI.Strategies
                             }
                             else
                             {
-                                currentSection = null; // Ця секція нам не підходить
+                                currentSection = null; 
                             }
                         }
-                        // Якщо знайшли студента і ми зараз всередині підходящої секції
                         else if (reader.NodeType == XmlNodeType.Element && reader.Name == "Student" && currentSection != null)
                         {
                             currentSection.Students.Add(reader.GetAttribute("Name"));
                         }
-                        // Якщо закриваючий тег </Section> і секція була створена -> додаємо в результат
                         else if (reader.NodeType == XmlNodeType.EndElement && reader.Name == "Section")
                         {
                             if (currentSection != null)
